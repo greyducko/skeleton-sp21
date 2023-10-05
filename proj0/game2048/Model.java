@@ -1,5 +1,6 @@
 package game2048;
 
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Observable;
 
@@ -114,11 +115,71 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        board.setViewingPerspective(side);
+
+        for (int col = 0; col < board.size(); col ++){
+            int mergeable = 1;
+
+            for (int row = board.size() - 1; row >= 0; row -- ){
+
+                Tile currTile = board.tile(col, row);
+                if (currTile != null){
+
+                    int rowToMerge = rowTileAbove( col, row);
+
+                    if ((rowToMerge > 0 ) && (mergeable  == -1)) {
+                        board.move(col, rowToMerge, currTile);
+                        changed = true;
+                        score += 2*currTile.value();
+                        mergeable = 1;
+                    } else {
+                        mergeable = -1;
+                        int emptyRow = emptyRowAbove(col, row);
+                        if (emptyRow > 0) {
+                            board.move(col, emptyRow, currTile);
+                            changed = true;
+                        }
+                    }
+                    // mergeable
+                }
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
+
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+
+    public int rowTileAbove( int col, int row){
+        int tile_above = -1;
+        Tile currTile = board.tile(col, row);
+        for ( int i = row + 1; i < board.size(); i++){
+            if ((board.tile(col,i)!= null) && (board.tile(col,i).value()!= currTile.value())){
+                break;
+            }
+            if (board.tile(col,i) == null){
+                continue;
+            }
+            if ((board.tile(col,i)!= null) &&  (board.tile(col, i).value() == currTile.value() )){
+                tile_above = i;
+                break;
+            }
+        }
+        return tile_above;
+    }
+
+    public int emptyRowAbove(int col, int row){
+        int emptyRow = -1;
+        for ( int i = row + 1; i < board.size(); i++){
+            if (board.tile(col, i) == null ){
+                emptyRow = i;
+            }
+        }
+        return emptyRow;
     }
 
     /** Checks if the game is over and sets the gameOver variable
