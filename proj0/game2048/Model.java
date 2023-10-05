@@ -138,6 +138,13 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (int col = 0; col < b.size(); col ++ ){
+            for (int row = 0; row < b.size(); row++) {
+                if ( b.tile(col,row) == null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +155,15 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int col = 0; col < b.size(); col ++ ){
+            for (int row = 0; row < b.size(); row++) {
+                if ( b.tile(col,row) != null){
+                    if (b.tile(col,row).value() == MAX_PIECE){
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -159,9 +175,45 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b)){
+            return true;
+        }
+        for (int col = 0; col < b.size(); col ++){
+            for (int row = 0; row < b.size(); row++){
+                int[] neighbors = neighbors(b, col, row);
+                for (int neighbor : neighbors){
+                    if (neighbor == b.tile(col,row).value()){
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
+    public static int[] neighbors(Board b,int col, int row) {
+        int left_col = col - 1;
+        int right_col = col + 1;
+        int top_row = row + 1;
+        int bottom_row = row -1;
+        int[] neighborList;
+        neighborList = new int[4];
+
+        if (left_col > 0){
+            neighborList[0] = b.tile(left_col, row).value();
+        }
+
+        if (right_col < b.size()){
+            neighborList[1] = b.tile(right_col, row).value();
+        }
+        if (top_row < b.size()){
+            neighborList[2] = b.tile(col, top_row).value();
+        }
+        if (bottom_row > 0){
+            neighborList[3] = b.tile(col, bottom_row).value();
+        }
+        return neighborList;
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
